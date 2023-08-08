@@ -1,0 +1,25 @@
+name: Deploy to Prod Server
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  Deploy:
+    runs-on: [self-hosted, aws-prod]
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: rm -rf /var/www/links
+      - run: cp ./ -r /var/www/links
+  slackNotification:
+    name: Slack Notification
+    needs: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: https://hooks.slack.com/services/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
+          SLACK_MESSAGE: New Build has been deployed on https://links.truffles.one
